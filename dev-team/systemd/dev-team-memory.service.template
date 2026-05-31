@@ -1,0 +1,12 @@
+[Unit]
+Description=Dev Team — Memory Daemon
+
+[Service]
+Type=simple
+ExecStart=/home/YOUR_USER/workspaces/dev-team/memory-store/.venv/bin/python \
+          /home/YOUR_USER/workspaces/dev-team/memory-store/memory_daemon.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

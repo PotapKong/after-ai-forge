@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+"""
+mem — memory daemon client.
+  mem recall "<query>" [--project NAME]   semantic search
+  mem save                                save record — JSON from stdin
+  mem health                              daemon health check
+
+No dependencies — stdlib only.
+"""
+import json, sys, urllib.request
+from pathlib import Path
+
+ENV = {}
+_e = Path(__file__).with_name(".env")
+if _e.exists():
+    for ln in _e.read_text().splitlines():
+        ln = ln.strip()
+        if ln and not ln.startswith("#") and "=" in ln:
+            k, v = ln.split("=", 1)
+            ENV[k.strip()] = v.strip()
+
+URL = f"http://127.0.0.1:{ENV.get('DAEMON_PORT', '5401')}"
+SECRET = ENV.get("DAEMON_SECRET", "")
+
+
+def call(path, payload=None):
+    data = json.dumps(payload).encode("utf-8") if payload is not None else None
+    req = urllib.request.Request(
+        URL + path,
+        data=data,
+        method="POST" if data is not None else "GET",
+        headers={"Content-Type": "application/json", "X-Daemon-Secret": SECRET},
+    )
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read())
+
+
+def main():
+    a = sys.argv[1:]
+    if not a:
+        print(__doc__)
+        sys.exit(1)
+    cmd = a[0]
+    try:
+        if cmd == "health":
+            print(json.dumps(call("/health"), ensure_ascii=False))
+        elif cmd == "recall":
+            if len(a) < 2:
+                print('usage: mem recall "<query>" [--project NAME]')
+                sys.exit(1)
+            payload = {"query": a[1]}
+            if "--project" in a:
+                payload["project"] = a[a.index("--project") + 1]
+                payload["scope"] = "project"
+            print(json.dumps(call("/recall", payload), ensure_ascii=False, indent=2))
+        elif cmd == "save":
+            print(json.dumps(call("/save", json.loads(sys.stdin.read())), ensure_ascii=False))
+        else:
+            print(__doc__)
+            sys.exit(1)
+    except Exception as e:
+        print(json.dumps({"ok": False, "error": f"{type(e).__name__}: {e}"}, ensure_ascii=False))
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

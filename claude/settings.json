@@ -1,0 +1,16 @@
+{
+  "permissionMode": "auto",
+  "hooks": {
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/workspaces/dev-team/hooks/log-agent.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

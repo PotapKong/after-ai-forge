@@ -1,0 +1,34 @@
+# Secrets & environment
+.env
+*.env
+.env.*
+!.env.example
+
+# Memory store data
+dev-team/memory-store/data/
+dev-team/memory-store/.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs
+*.log
+.observability/
+
+# Claude local state
+.claude/projects/
+.claude/sessions/
+.claude/telemetry/

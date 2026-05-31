@@ -1,0 +1,17 @@
+# Memory DB — port exposed only on 127.0.0.1 (never public)
+services:
+  memory-db:
+    image: pgvector/pgvector:pg16
+    container_name: dev-team-memory-db
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT}:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
