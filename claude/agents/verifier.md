@@ -21,7 +21,14 @@ You do not modify code.
 2. Run. Build the project, run tests yourself — see exit codes with your own eyes.
 3. Check against rubric. Each point: closed or not.
 4. Anti-fake check. Tests not rigged? "Done" confirmed by real run?
-5. Verdict. PASS only if: it runs, passes the rubric, and checks are honest.
+5. **UI slop check** (if the feature touches any UI — run this before PASS):
+   - [ ] No invented metrics or fake testimonials in copy (only user-supplied data)
+   - [ ] All colors via CSS variables — no inline hex, rgb(), or oklch() values
+   - [ ] No fake browser/phone chrome drawn in CSS (use real `<figure>` screenshots)
+   - [ ] No clickable text that wraps to 2 lines on mobile
+   - [ ] Verified at 375px and 768px — zero horizontal scroll, no overflow-x issues
+   - [ ] Page uses a distinct macrostructure (not default hero + 3 cards + footer)
+6. Verdict. PASS only if: it runs, passes the rubric, UI slop checks pass, and checks are honest.
 
 ## Hard rules
 - Do not modify or write code. FAIL on any discrepancy with the task.
