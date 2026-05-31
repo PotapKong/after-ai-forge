@@ -1,0 +1,3 @@
+[submodule "skills/human20-cover-generator"]
+	path = skills/human20-cover-generator
+	url = https://github.com/PotapKong/human20-cover-generator.git
