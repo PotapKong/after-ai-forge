@@ -1,8 +1,8 @@
 # after-ai-forge 🔥
 
-**AI dev team with persistent memory — run by Claude Code.**
+**AI dev team with persistent memory — adapters for Claude Code and Codex.**
 
-An orchestrator + 6 specialized sub-agents + 3-level memory system that learns across projects.
+An orchestrator + 6 specialized departments + 3-level memory system that learns across projects.
 
 ```
 Orchestrator (main session)
@@ -13,8 +13,12 @@ Orchestrator (main session)
 ├── security      — read-only STRIDE audit
 └── verifier      — independent acceptance (PASS/FAIL)
 
+Adapters
+├── claude/       — Claude Code named sub-agents and hooks
+└── codex/        — Codex AGENTS.md instructions and role cards
+
 Memory
-├── Level 1 — personal per-agent (Claude Code native)
+├── Level 1 — runtime memory/profile (Claude Code native, Codex memory if available)
 ├── Level 2 — project docs/ under git
 └── Level 3 — central cross-project Postgres + pgvector (semantic search)
 ```
@@ -33,7 +37,18 @@ Memory
 | TDD enforcement | ❌ | ✅ RED→GREEN→REFACTOR |
 | Requirements before pipeline | ❌ | ✅ Step 0 |
 
-## Quick start
+## Quick start: give it to your agent
+
+Ask your coding agent:
+
+> Read this repo, follow `BOOTSTRAP.md`, detect whether you are running under Claude Code or Codex, install the matching adapter, set up the workspace template, and verify the dev-team setup.
+
+The bootstrap runbook keeps runtime-specific behavior separate:
+
+- Claude Code: real named sub-agents from `claude/agents/*.md`.
+- Codex: orchestrator instructions from `codex/AGENTS.md` plus reusable role cards for generic workers/explorers.
+
+## Manual quick start: Claude Code
 
 ```bash
 git clone https://github.com/PotapKong/after-ai-forge
@@ -59,6 +74,7 @@ python3 -m venv .venv
 chmod +x mem
 
 # 5. Enable systemd service (Linux/WSL)
+cd ../..
 cp dev-team/systemd/dev-team-memory.service.template \
    ~/.config/systemd/user/dev-team-memory.service
 # edit ExecStart path, then:
@@ -67,6 +83,31 @@ systemctl --user enable --now dev-team-memory
 
 # 6. Verify
 ./dev-team/memory-store/mem health   # {"ok": true}
+```
+
+## Manual quick start: Codex
+
+```bash
+git clone https://github.com/PotapKong/after-ai-forge
+cd after-ai-forge
+
+# 1. Install Codex workspace instructions
+mkdir -p ~/workspaces
+cp codex/AGENTS.md ~/workspaces/AGENTS.md
+
+# 2. Copy the project template and Codex role cards
+cp -r workspaces/_template ~/workspaces/_template
+mkdir -p ~/workspaces/dev-team/codex
+cp -r codex/role-cards ~/workspaces/dev-team/codex/role-cards
+
+# 3. Optional: start shared memory
+cd dev-team/memory-store
+cp .env.example .env          # fill in your passwords
+docker compose up -d
+python3 -m venv .venv
+.venv/bin/pip install "psycopg[binary]" fastembed
+chmod +x mem
+./mem health                  # {"ok": true}
 ```
 
 See [INSTALL.md](INSTALL.md) for detailed per-OS instructions.
@@ -92,6 +133,12 @@ See [INSTALL.md](INSTALL.md) for detailed per-OS instructions.
   CLAUDE.md          global profile + standards
   agents/            6 agent definitions
   settings.json      permissionMode + observability hook
+
+~/workspaces/AGENTS.md
+  Codex orchestrator instructions + role ownership contracts
+
+~/workspaces/dev-team/codex/
+  role-cards/        reusable prompts for Codex worker/explorer delegation
 
 ~/workspaces/dev-team/
   memory-store/      Postgres + pgvector + daemon + client
@@ -126,7 +173,7 @@ echo '{"kind":"lesson","project":"<name>","title":"...","lesson":"..."}' | mem s
 
 ## Requirements
 
-- Claude Code CLI with agent support
+- Claude Code CLI with agent support, or Codex / an AGENTS.md-aware coding agent
 - Docker + docker compose
 - Python 3.10+
 - ~2 GB disk

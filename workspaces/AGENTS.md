@@ -1,5 +1,9 @@
 # AGENTS.md — team coordination contract
 
+This is the shared contract for agent-team workspaces. Claude Code uses it
+alongside `CLAUDE.md` and named agents. Codex or AGENTS.md-aware agents can use
+the Codex adapter in `codex/AGENTS.md` as the primary orchestrator instruction.
+
 ## File ownership
 | Agent | Owns (writes) | Does not touch |
 |---|---|---|
